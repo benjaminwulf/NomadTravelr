@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -15,25 +14,21 @@
   <link rel="stylesheet" type="text/css" href="assets/css/style.css">
   <title>Google Maps API Research</title>
 </head>
-
 <body>
   <!-- Eric Zemp I added the begginings of the log in page  -->
   <div id="login-view" class="first-div">
     <h3>Welcome to Nomad-Travlr!</h3>
-    <h4>Please sign in or register an account</h4>
+    <h2>Please sign in or register an account</h2>
     <input type="email" placeholder="Email" id="email-input" />
     <input type="password" placeholder="Password" id="pass-input" />
     <button id="logIn">Login</button>
     <button id="register">Register</button>
-    <button id="gmailSignIn">Sign In With Google</button>
-
-
+    <!-- <button id="gmailSignIn">Sign In With Google</button> -->
   </div>
   <!-- End Log-In Page -->
   <!-- Eric Zemp Added another Div around all the other information so it could be easily hidden -->
   <div id="loggedIn-view" class="main-div">
     <!--==========================================================================================  -->
-
     <div class="header center-align">
       <h1 class="center-align">Nomad Travelr
         <i class="fa fa-suitcase" aria-hidden="true"></i>
@@ -42,7 +37,6 @@
       <button class="right-align btn" id="logOut">Log Out</button>
       <!-- =========================================== -->
     </div>
-
     <div class="container">
       <div class="row">
         <div class="col s7">
@@ -53,10 +47,10 @@
           </div>
               <div id="map"></div>
           </div>
-
         <div class="col s5">
+            <h4>My Cities</h4>
             <div class="favCities">
-              <h4>My Cities</h4>
+              
             </div>
             <h4>Search</h4>
             <h6>
@@ -68,11 +62,7 @@
       </div>
       </div>
     </div>
-
   </div>
-
-
-
   <script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
     crossorigin="anonymous"></script>
   <!-- Compiled and minified JavaScript -->
@@ -81,7 +71,5 @@
   <script src="https://www.gstatic.com/firebasejs/5.2.0/firebase.js"></script>
   <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDdVJ19ev1TIYXPrMF_5w1WLRPownVXj5g&callback=initMap&libraries=places"
     async defer></script>
-
 </body>
-
 </html>
