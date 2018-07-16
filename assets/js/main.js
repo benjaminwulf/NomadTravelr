@@ -168,7 +168,8 @@ $(document).on('click', '.addButton', function (event) {
 });
 $(document).on('click', '.deleteCity', function (event) {
   var divToDelete = $(this).val();
-  $('.' + divToDelete.split(",")[0]).remove();
+  // $('.' + divToDelete.split(",")[0]).remove();
+  $('.' + divToDelete.replace(/[, ]/g,'')).remove();
   var userId = firebase.auth().currentUser.uid;
   console.log(userId)
   database.ref('users/'+userId+'/cities/' + divToDelete).remove();
@@ -190,7 +191,8 @@ firebase.auth().onAuthStateChanged(function (user) {
           var lat = childSnapshot.val().lat;
           var long = childSnapshot.val().long;
           var newCityDiv = $('<div>');
-          newCityDiv.addClass(cityName.split(",")[0]);
+          // newCityDiv.addClass(cityName.split(",")[0]);
+          newCityDiv.addClass(cityName.replace(/[, ]/g,''));
           newCityDiv.append('<button class="favCityButton btn-flat" value="' + cityName + '">' + cityName + '</button>')
           var newDelBtn = $('<button class="deleteCity" value="' + cityName + '">x</button>')
           newCityDiv.append(newDelBtn);
@@ -211,7 +213,9 @@ firebase.auth().onAuthStateChanged(function (user) {
       console.log(userId)
       database.ref('users/'+userId+'/venues/').on("child_added", function (childSnapshot) {
         var newAddedVenue = childSnapshot.val().venueName;
-        var cityToAddTo = childSnapshot.val().inCity.split(",")[0];
+        // var cityToAddTo = childSnapshot.val().inCity.split(",")[0];
+        var cityToAddTo = childSnapshot.val().inCity.replace(/[, ]/g,'');
+        console.log('.' + cityToAddTo);
         $('.' + cityToAddTo).append('<p class="favVenue">' + newAddedVenue + '</p>');
       });
     }
