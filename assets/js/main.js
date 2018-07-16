@@ -7,13 +7,11 @@ var config = {
   messagingSenderId: "588346345795"
 };
 firebase.initializeApp(config);
-
 var database = firebase.database();
 var map, infoWindow;
 var cityName = [];
 // Global variable for searching with Foursquare API
 var cityName = "";
-
 //INTIAL MAP FUNCTION
 function initMap() {
   var map = new google.maps.Map(document.getElementById('map'), {
@@ -27,27 +25,25 @@ function initMap() {
   document.getElementById('submit').addEventListener('click', function () {
     geocodeAddress(geocoder, map);
   });
-
   // INITIAL LOADING OF CITY NAMES WHEN PAGE IS REFRESHED
-  database.ref('cities/').on("child_added", function (childSnapshot) {
-    cityName = (childSnapshot.val().cityName);
-    var lat = childSnapshot.val().lat;
-    var long = childSnapshot.val().long;
-    var newCityDiv = $('<div>');
-    newCityDiv.addClass(cityName.split(",")[0]);
-    newCityDiv.append('<button class="favCityButton btn-flat" value="' + cityName + '">' + cityName + '</button>')
-    var newDelBtn = $('<button class="deleteCity" value="' + cityName + '">x</button>')
-    newCityDiv.append(newDelBtn);
-    $('.favCities').append(newCityDiv);
-    var marker = new google.maps.Marker({
-      map: map,
-      position: {
-        lat: lat,
-        lng: long
-      }
-    })
-  });
-
+  // database.ref('cities/').on("child_added", function (childSnapshot) {
+  //   cityName = (childSnapshot.val().cityName);
+  //   var lat = childSnapshot.val().lat;
+  //   var long = childSnapshot.val().long;
+  //   var newCityDiv = $('<div>');
+  //   newCityDiv.addClass(cityName.split(",")[0]);
+  //   newCityDiv.append('<button class="favCityButton btn-flat" value="' + cityName + '">' + cityName + '</button>')
+  //   var newDelBtn = $('<button class="deleteCity" value="' + cityName + '">x</button>')
+  //   newCityDiv.append(newDelBtn);
+  //   $('.favCities').append(newCityDiv);
+  //   var marker = new google.maps.Marker({
+  //     map: map,
+  //     position: {
+  //       lat: lat,
+  //       lng: long
+  //     }
+  //   })
+  // });
   $(document).on('click', '.favCityButton', function () {
     cityName = $(this).val();
     var geocoder = new google.maps.Geocoder();
@@ -60,16 +56,13 @@ function initMap() {
       }
     });
   });
-
-  database.ref('venues').on("child_added", function (childSnapshot) {
-    var newAddedVenue = childSnapshot.val().venueName;
-    var cityToAddTo = childSnapshot.val().inCity.split(",")[0];
-    $('.' + cityToAddTo).append('<p class="favVenue">' + newAddedVenue + '</p>');
-  });
+  // database.ref('venues').on("child_added", function (childSnapshot) {
+  //   var newAddedVenue = childSnapshot.val().venueName;
+  //   var cityToAddTo = childSnapshot.val().inCity.split(",")[0];
+  //   $('.' + cityToAddTo).append('<p class="favVenue">' + newAddedVenue + '</p>');
+  // });
 }
-
 //FUNCTIONS THAT ADD A SEARCH BAR TO THE MAP AND GEOCODE BASED ON THE NAME INPUT - puts a marker when you add the place to "My Cities"
-
 function geocodeAddress(geocoder, resultsMap) {
   var address = $('#address').val().trim();
   geocoder.geocode({
@@ -88,7 +81,9 @@ function geocodeAddress(geocoder, resultsMap) {
         console.log(cityNameSearch);
         var latitude = results[0].geometry.location.lat();
         var longitude = results[0].geometry.location.lng();
-        database.ref('cities/' + cityNameSearch).set({
+        var userId = firebase.auth().currentUser.uid;
+        console.log(userId) 
+        database.ref('users/'+userId+'/cities/' + cityNameSearch).set({
           cityName: cityNameSearch,
           lat: latitude,
           long: longitude
@@ -99,7 +94,6 @@ function geocodeAddress(geocoder, resultsMap) {
     }
   });
 }
-
 //When a "my cities" button is clicked
 $(document).on('click', '.favCityButton', function () {
   // This global variable is to be passed Foursquare AJAX call
@@ -112,7 +106,6 @@ $(document).on('click', '.favCityButton', function () {
   $('.city-form').append(newForm);
   return cityName;
 });
-
 $(document).on('click', '.formSubmit', function (event) {
   event.preventDefault();
   $('.city-venues').empty();
@@ -157,7 +150,6 @@ $(document).on('click', '.formSubmit', function (event) {
     });
   });
 });
-
 $(document).on('click', '.addButton', function (event) {
   event.preventDefault();
   var addedCity = $(this).attr("cityName")
@@ -165,22 +157,22 @@ $(document).on('click', '.addButton', function (event) {
   var addedVenueLat = $(this).attr("latitude");
   var addedVenueLng = $(this).attr("longitude");
   console.log(addedVenueName);
-  database.ref('venues').push({
+  var userId = firebase.auth().currentUser.uid;
+  console.log(userId)
+  database.ref('/users/'+userId+'/venues/').push({
     inCity: addedCity,
     venueName: addedVenueName,
     venueLat: addedVenueLat,
     venueLng: addedVenueLng
   });
 });
-
 $(document).on('click', '.deleteCity', function (event) {
   var divToDelete = $(this).val();
   $('.' + divToDelete.split(",")[0]).remove();
-  database.ref('cities/' + divToDelete).remove();
+  var userId = firebase.auth().currentUser.uid;
+  console.log(userId)
+  database.ref('users/'+userId+'/cities/' + divToDelete).remove();
 });
-
-
-
 // =========Fire base auth code==========
 // This allows us to change what is displayed on the screen
 firebase.auth().onAuthStateChanged(function (user) {
@@ -191,7 +183,37 @@ firebase.auth().onAuthStateChanged(function (user) {
     var user = firebase.auth().currentUser;
     // If we have a user we can use this to Display their name on the web page
     if (user != null) {
-      var email_id = user.Email;
+      var userId = firebase.auth().currentUser.uid;
+      console.log(userId)
+      database.ref('users/'+userId+'/cities/').on("child_added", function (childSnapshot) {
+        cityName = (childSnapshot.val().cityName);
+          var lat = childSnapshot.val().lat;
+          var long = childSnapshot.val().long;
+          var newCityDiv = $('<div>');
+          newCityDiv.addClass(cityName.split(",")[0]);
+          newCityDiv.append('<button class="favCityButton btn-flat" value="' + cityName + '">' + cityName + '</button>')
+          var newDelBtn = $('<button class="deleteCity" value="' + cityName + '">x</button>')
+          newCityDiv.append(newDelBtn);
+          $('.favCities').append(newCityDiv);
+          var marker = new google.maps.Marker({
+            map: map,
+            position: {
+              lat: lat,
+              lng: long
+            }
+          })
+        });
+    
+      $(document).on('click', '.favCityButton', function () {
+        cityName = $(this).val();
+      });
+      var userId = firebase.auth().currentUser.uid;
+      console.log(userId)
+      database.ref('users/'+userId+'/venues/').on("child_added", function (childSnapshot) {
+        var newAddedVenue = childSnapshot.val().venueName;
+        var cityToAddTo = childSnapshot.val().inCity.split(",")[0];
+        $('.' + cityToAddTo).append('<p class="favVenue">' + newAddedVenue + '</p>');
+      });
     }
   } else {
     // Display Log-in Page if user isnt signed in
@@ -201,6 +223,10 @@ firebase.auth().onAuthStateChanged(function (user) {
 });
 // =====RegisterUser=====
 $("#register").on("click", function register() {
+  initMap()
+  $(".favCities").empty();
+  $('.city-form').empty();
+  $('.city-venues').empty();
   userEmail = document.getElementById("email-input").value;
   var userPass = document.getElementById("pass-input").value;
   firebase.auth().createUserWithEmailAndPassword(userEmail, userPass)
@@ -208,20 +234,26 @@ $("#register").on("click", function register() {
       console.log("Error : " + errorMessage);
     }).then(
       function writeUserData() {
-        firebase.database().ref('users/' + userEmail.replace(".", "")).set({
+        var userId = firebase.auth().currentUser.uid;
+        console.log(userId)
+        firebase.database().ref('users/' + userId).set({
           email: userEmail
         });
       })
 })
-
-
 // ======LogOut Function====
 $("#logOut").on("click", function logout() {
+  $('.city-form').empty();
+  $('.city-venues').empty();
+  $(".favCities").empty();
   firebase.auth().signOut();
 })
 // =====LogIn Function=====
-
 $("#logIn").on("click", function login() {
+  initMap();
+  $('.city-form').empty();
+  $('.city-venues').empty();
+  $(".favCities").empty();
   var userEmail = document.getElementById("email-input").value;
   var userPass = document.getElementById("pass-input").value;
   console.log(userEmail);
@@ -246,7 +278,6 @@ $("#gmailSignIn").on("click", function googleSignIn() {
     console.log("Error : " + errorMessage);
   });
 })
-
 // ==========Method Two Page Redirect Haven't Tested Can't say for sure it works=======
 // 
 // $("#gmailSignIn").on("click",function googleSignIn(){{
